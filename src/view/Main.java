@@ -82,6 +82,7 @@ public class Main {
 
 	// Menu com a funções principais do programa
 	private static void menuPrincipal(String usuario) {
+		
 		Scanner sc = new Scanner(System.in);
 
 		System.out.print("\n1 - Adicionar gasto\n" + "2 - Remover gasto\n" + "3 - Editar gasto\n" + "4 - Relatórios\n"

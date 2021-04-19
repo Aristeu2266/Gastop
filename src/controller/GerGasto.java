@@ -11,12 +11,23 @@ public class GerGasto {
 
 	// armazena os gastos em um arquivo
 	public static void escreveGasto(String usuario, double valor, String desc) {
-		GerArquivo.escreveGasto(usuario, new Gasto(valor, desc));
+		GerArquivo.escreveGasto(new Gasto(usuario, valor, desc));
 	}
 
 	//retorna um arraylist dos gastos de um usuário
 	public static ArrayList<Gasto> getGastosUsuario(String usuario) {
-		return GerJSON.gastosJSONtoArrayList(GerJSON.getJSON("dados\\" + usuario + ".txt"));
+		ArrayList<Gasto> gastosUsuario = new ArrayList<Gasto>();
+		ArrayList<Gasto> gastos = GerJSON.gastosJSONtoArrayList(GerJSON.getJSON("dados\\gastos.txt"));
+		Iterator<Gasto> it = gastos.iterator();
+
+		while (it.hasNext()) {
+			Gasto gasto = it.next();
+			if (gasto.getUsuario().equals(usuario)) {
+				gastosUsuario.add(gasto);
+			}
+		}
+		
+		return gastosUsuario;
 	}
 
 	//retorna um arraylist dos gastos de um usuário em um determinado periodo
@@ -72,7 +83,7 @@ public class GerGasto {
 		for (Gasto gasto : gastosUsuario) {
 			if (gasto.equals(gastosPeriodo.get(i))) {
 				gastosUsuario.remove(gasto);
-				GerArquivo.sobreescreveGastos(usuario, gastosUsuario);
+				GerArquivo.sobreescreveGastos(gastosUsuario);
 				return true;
 			}
 		}
@@ -92,7 +103,7 @@ public class GerGasto {
 			}
 		}
 		
-		GerArquivo.sobreescreveGastos(usuario, gastosUsuario);
+		GerArquivo.sobreescreveGastos(gastosUsuario);
 	}
 
 	// faz a soma de todos os gastos de um usuárip

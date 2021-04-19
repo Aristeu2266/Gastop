@@ -26,10 +26,10 @@ public class GerArquivo {
 	}
 
 	// escreve gastos no txt do usuário
-	public static void escreveGasto(String usuario, Gasto gasto) {
-		JSONArray conteudo = GerJSON.getJSON("dados\\" + usuario + ".txt");
+	public static void escreveGasto(Gasto gasto) {
+		JSONArray conteudo = GerJSON.getJSON("dados\\gastos.txt");
 		
-		try (FileWriter arquivo = new FileWriter("dados\\" + usuario + ".txt")) {
+		try (FileWriter arquivo = new FileWriter("dados\\gastos.txt")) {
 			conteudo.add(gasto.getJSON());
 			arquivo.write(conteudo.toJSONString());
 		} catch (IOException e) {
@@ -38,10 +38,10 @@ public class GerArquivo {
 	}
 
 	// edita um gasto no arquivo txt de um usuário
-	public static void sobreescreveGastos(String usuario, ArrayList<Gasto> gastos) {
-		resetaArquivo("dados\\" + usuario + ".txt");
+	public static void sobreescreveGastos(ArrayList<Gasto> gastos) {
+		resetaArquivo("dados\\gastos.txt");
 		for (Gasto gasto : gastos) {
-			escreveGasto(usuario, gasto);
+			escreveGasto(gasto);
 		}
 	}
 	

@@ -62,22 +62,24 @@ public class GerJSON {
 
 	// transforma um json object em um json usuário
 	private static Gasto JSONtoGasto(JSONObject objeto) {
+		String user = "";
 		double valor = 0;
 		String desc = "";
 		String data = "";
 		for (Object chave : objeto.keySet()) {
-			if (chave.equals("valor")) {
+			if (chave.equals("usuario")) {
+				user = (String) objeto.get(chave);
+			} else if (chave.equals("valor")) {
 				valor = (double) objeto.get(chave);
+			} else if (chave.equals("descricao")) {
+				desc = (String) objeto.get(chave);
 			} else {
-				if (chave.equals("descricao")) {
-					desc = (String) objeto.get(chave);
-				} else {
-					data = (String) objeto.get(chave);
-				}
+				data = (String) objeto.get(chave);
 			}
+
 		}
 
-		return new Gasto(valor, desc, data);
+		return new Gasto(user, valor, desc, data);
 	}
 
 	// transforma um json array em um array de usuario

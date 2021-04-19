@@ -7,25 +7,29 @@ import java.util.Date;
 import org.json.simple.JSONObject;
 
 public class Gasto {
+	private String user;
 	private String desc;
 	private double valor;
 	private String data;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 	// Metodos construtores
-	public Gasto(double valor, String desc) {
+	public Gasto(String user, double valor, String desc) {
+		this.user = user;
 		this.valor = valor;
 		this.desc = desc;
 		this.data = sdf.format(new Date(System.currentTimeMillis()));
 	}
 	
-	public Gasto(double valor) {
+	public Gasto(String user, double valor) {
+		this.user = user;
 		this.valor = valor;
 		this.desc = "";
 		this.data = sdf.format(new Date(System.currentTimeMillis()));
 	}
 	
-	public Gasto(double valor, String desc, String data) {
+	public Gasto(String user, double valor, String desc, String data) {
+		this.user = user;
 		this.valor = valor;
 		this.desc = desc;
 		this.data = data;
@@ -40,16 +44,21 @@ public class Gasto {
 	}
 	
 	public Gasto clone() {
-		return new Gasto(this.valor, this.desc, this.data);
+		return new Gasto(this.user, this.valor, this.desc, this.data);
 	}
 
 	// getters
 	public JSONObject getJSON() {
 		JSONObject objeto = new JSONObject();
+		objeto.put("usuario", user);
 		objeto.put("descricao", desc);
 		objeto.put("valor", valor);
 		objeto.put("data", data);
 		return objeto;
+	}
+	
+	public String getUsuario() {
+		return this.user;
 	}
 
 	public Date getData() {
