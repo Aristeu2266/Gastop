@@ -154,6 +154,7 @@ public class Main {
 			} while(nome.equals("") || existe);
 
 			GerCartao.escreveCartao(usuario, nome);
+			menuPrincipal(usuario);
 			break;
 			
 		case '0':
