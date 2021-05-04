@@ -4,14 +4,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import model.Cartao;
 import model.Gasto;
-import model.Usuario;
+import model.GastoCartao;
+import model.GastoComum;
 
 public class GerGasto {
 
 	// armazena os gastos em um arquivo
 	public static void escreveGasto(String usuario, double valor, String desc) {
-		GerArquivo.escreveGasto(new Gasto(usuario, valor, desc));
+		GerArquivo.escreveGasto(new GastoComum(usuario, valor, desc));
+	}
+
+	// armazena os gastos em um arquivo
+	public static void escreveGasto(String usuario, double valor, String desc, Cartao cartao) {
+		GerArquivo.escreveGasto(new GastoCartao(usuario, valor, desc, cartao));
 	}
 
 	//retorna um arraylist dos gastos de um usuário
@@ -64,7 +71,7 @@ public class GerGasto {
 	}
 	
 	// retorna 
-	public static Gasto getGastoUsuario(String usuario, ArrayList<Gasto> gastosPeriodo, int i) {
+	public static Gasto getGastoUsuario(String usuario, ArrayList<GastoComum> gastosPeriodo, int i) {
 		ArrayList<Gasto> gastosUsuario = getGastosUsuario(usuario);
 		
 		for (Gasto gasto : gastosUsuario) {

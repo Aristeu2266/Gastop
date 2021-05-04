@@ -5,9 +5,11 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 import controller.GerArquivo;
+import controller.GerCartao;
 import controller.GerGasto;
 import controller.GerUser;
 import controller.Util;
+import model.Cartao;
 import model.Gasto;
 
 public class Main {
@@ -73,7 +75,7 @@ public class Main {
 
 			return menuLogin();
 		case '0':
-			System.out.println("Saindo...\n");
+			System.out.println("\nSaindo...\n");
 			return null;
 		}
 
@@ -82,27 +84,18 @@ public class Main {
 
 	// Menu com a funções principais do programa
 	private static void menuPrincipal(String usuario) {
-		
+
 		Scanner sc = new Scanner(System.in);
 
 		System.out.print("\n1 - Adicionar gasto\n" + "2 - Remover gasto\n" + "3 - Editar gasto\n" + "4 - Relatórios\n"
-				+ "5 - Configurar renda mensal\n" + "0 - Logout\n> ");
+				+ "5 - Configurar renda mensal\n" + "6 - Cadastrar cartão\n" + "0 - Logout\n> ");
 		char menuPrincipal = (char) sc.nextLine().charAt(0);
 
 		switch (menuPrincipal) {
 		case '1':
-			System.out.println("\nAdicionando gasto:");
-			System.out.print("Valor: ");
-			double valor = sc.nextDouble();
-			sc.nextLine();
-			System.out.print("Descrição: ");
-			String descricao = sc.nextLine();
-			System.out.println();
-
-			GerGasto.escreveGasto(usuario, valor, descricao);
-
-			menuPrincipal(usuario);
+			adicionarGasto(usuario);
 			break;
+			
 		case '2':
 			System.out.println("\nRemovendo gasto:");
 			ArrayList<Gasto> gastosPeriodo = selecionarPeriodo(usuario);
@@ -117,12 +110,15 @@ public class Main {
 
 			menuPrincipal(usuario);
 			break;
+			
 		case '3':
 			editarGasto(usuario);
 			break;
+			
 		case '4':
 			relatorio(usuario);
 			break;
+			
 		case '5':
 			System.out.println("\nConfigurando renda mensal:");
 			double ganho = 0;
@@ -139,12 +135,104 @@ public class Main {
 			System.out.println("Renda mensal atualizada");
 			menuPrincipal(usuario);
 			break;
+			
+		case '6':
+			System.out.println("\nCadastrando cartão:");
+			String nome = "";
+			boolean existe;
+
+			do {
+				System.out.print("Nome do cartão: ");
+				nome = sc.nextLine();
+				existe = GerCartao.cartaoExiste(usuario, nome);
+				
+				if (nome.equals("")) {
+					System.out.println("Nome inválido\n");
+				} else if(existe){
+					System.out.println("Cartão já existe\n");
+				}
+			} while(nome.equals("") || existe);
+
+			GerCartao.escreveCartao(usuario, nome);
+			break;
+			
 		case '0':
-			System.out.println("Desconectando...");
+			System.out.println("\nDesconectando...");
 			main(null);
 			break;
 		}
 
+	}
+
+	// Menu de opções de adicionar gasto
+	public static void adicionarGasto(String usuario) {
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("\nAdicionando gasto:");
+		System.out.print("1 - Gasto comum\n2 - Gasto com cartão\n0 - Voltar\n> ");
+		int opt;
+
+		do {
+			opt = sc.nextInt();
+			sc.nextLine();
+			if (opt < 0 || opt > 2) {
+				System.out.println("Opção inválida!\n");
+			}
+		} while (opt < 0 || opt > 2);
+
+		double valor;
+		String descricao;
+
+		switch (opt) {
+		case 1:
+			System.out.print("Valor: ");
+			valor = sc.nextDouble();
+			sc.nextLine();
+			System.out.print("Descrição: ");
+			descricao = sc.nextLine();
+
+			GerGasto.escreveGasto(usuario, valor, descricao);
+
+			menuPrincipal(usuario);
+			break;
+		case 2:
+			if (GerUser.usuarioTemCartao(usuario)) {
+				System.out.print("Valor: ");
+				valor = sc.nextDouble();
+				sc.nextLine();
+				System.out.print("Descrição: ");
+				descricao = sc.nextLine();
+
+				Cartao cartao = selecionaCartao(usuario);
+
+				GerGasto.escreveGasto(usuario, valor, descricao, cartao);
+			} else {
+				System.out.println("Você não possui nenhum cartão cadastrado!");
+			}
+
+			menuPrincipal(usuario);
+			break;
+		case 0:
+			menuPrincipal(usuario);
+			break;
+		}
+	}
+
+	private static Cartao selecionaCartao(String usuario) {
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("Selecione o cartão (0 - sair):");
+		ArrayList<Cartao> cartoesUser = GerCartao.getCartoesUsuario(usuario);
+		mostraCartoes(cartoesUser);
+		System.out.print("> ");
+		int indice = sc.nextInt();
+		sc.nextLine();
+
+		if (indice > 0) {
+			return cartoesUser.get(indice - 1);
+		} else {
+			return null;
+		}
 	}
 
 	// Menu de opções de dados processados
@@ -166,11 +254,11 @@ public class Main {
 				double saldoDisponivel = GerUser.saldoDisponivel(usuario);
 				double porcentagemGasta = GerUser.porcentagemGasta(usuario);
 				System.out.printf("\nSaldo disponível: %.2f\n", saldoDisponivel);
-				System.out.printf("Porcentagem gasta: %.2f%%\n", porcentagemGasta*100);
+				System.out.printf("Porcentagem gasta: %.2f%%\n", porcentagemGasta * 100);
 			} catch (Exception e) {
 				System.out.println("\nRenda mensal não informada");
 			}
-			
+
 			relatorio(usuario);
 			break;
 		case '0':
@@ -185,14 +273,14 @@ public class Main {
 
 	private static void editarGasto(String usuario) {
 		Scanner sc = new Scanner(System.in);
-		
+
 		System.out.println("\nEditando gasto:");
 		ArrayList<Gasto> gastosPeriodo = selecionarPeriodo(usuario);
 		mostraGastos(gastosPeriodo);
 		System.out.print("Qual gasto deseja editar (0 - sair): ");
 		int indice = sc.nextInt();
 		sc.nextLine();
-		
+
 		Gasto editado = null;
 
 		char opt = 'ç';
@@ -202,9 +290,10 @@ public class Main {
 			mostraGasto(editado);
 
 			do {
-				System.out.print("O que deseja alterar:\n1 - Valor\n2 - Descrição\n3 - Data (Ex.:31/12/2021)\n0 - Confirmar\n> ");
+				System.out.print(
+						"O que deseja alterar:\n1 - Valor\n2 - Descrição\n3 - Data (Ex.:31/12/2021)\n0 - Confirmar\n> ");
 				opt = sc.nextLine().charAt(0);
-				
+
 				if (opt != '1' && opt != '2' && opt != '3' && opt != '0') {
 					System.out.print("Opção inválida\n> ");
 				}
@@ -225,7 +314,7 @@ public class Main {
 				break;
 			case '3':
 				String data = sc.nextLine();
-				while(!Util.validaDataComDia(data)) {
+				while (!Util.validaDataComDia(data)) {
 					System.out.print("Data inválida\n> ");
 					data = sc.nextLine();
 				}
@@ -234,7 +323,7 @@ public class Main {
 				break;
 			}
 		}
-		
+
 		GerGasto.editaGasto(usuario, gastosPeriodo, opt, editado);
 
 		menuPrincipal(usuario);
@@ -247,8 +336,8 @@ public class Main {
 		char opt = 0;
 
 		do {
-			System.out
-					.print("1 - Mês corrente\n" + "2 - Mês específico\n" + "3 - Período específico\n" + "0 - Voltar\n> ");
+			System.out.print(
+					"1 - Mês corrente\n" + "2 - Mês específico\n" + "3 - Período específico\n" + "0 - Voltar\n> ");
 			opt = sc.nextLine().charAt(0);
 		} while (opt != '1' && opt != '2' && opt != '3' && opt != '0');
 
@@ -294,8 +383,8 @@ public class Main {
 	private static void mostraGastos(ArrayList<Gasto> gastos) {
 		int i = 1;
 		System.out.println("\nÍndice | Valor | Descrição | Data");
-		for (Iterator iterator = gastos.iterator(); iterator.hasNext(); i++) {
-			Gasto gasto = (Gasto) iterator.next();
+		for (Iterator<Gasto> iterator = gastos.iterator(); iterator.hasNext(); i++) {
+			Gasto gasto = iterator.next();
 			System.out.println(i + " | " + gasto);
 		}
 	}
@@ -303,6 +392,16 @@ public class Main {
 	private static void mostraGasto(Gasto gasto) {
 		System.out.println("\nValor: " + gasto.getValor() + "\nDescrição: " + gasto.getDescricao() + "\nData: "
 				+ gasto.getDataStr() + "\n");
+	}
+
+	// mostra de forma formatada os cartoes da lista passada como parametro
+	private static void mostraCartoes(ArrayList<Cartao> cartoes) {
+		int i = 1;
+		System.out.println("\nÍndice | Valor | Descrição | Data");
+		for (Iterator<Cartao> iterator = cartoes.iterator(); iterator.hasNext(); i++) {
+			Cartao cartao = iterator.next();
+			System.out.println(i + " | " + cartao);
+		}
 	}
 
 }

@@ -7,11 +7,11 @@ import java.util.Date;
 import org.json.simple.JSONObject;
 
 public class Gasto {
-	private String user;
-	private String desc;
-	private double valor;
-	private String data;
-	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+	protected String user;
+	protected String desc;
+	protected double valor;
+	protected String data;
+	protected SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 	// Metodos construtores
 	public Gasto(String user, double valor, String desc) {
@@ -54,6 +54,7 @@ public class Gasto {
 		objeto.put("descricao", desc);
 		objeto.put("valor", valor);
 		objeto.put("data", data);
+		objeto.put("cartao", "");
 		return objeto;
 	}
 	

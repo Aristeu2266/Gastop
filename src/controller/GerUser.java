@@ -3,6 +3,7 @@ package controller;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import model.Cartao;
 import model.Usuario;
 
 public class GerUser {
@@ -82,6 +83,11 @@ public class GerUser {
 		} else {
 			throw new Exception("Renda não informada");
 		}
+	}
+	
+	public static boolean usuarioTemCartao(String usuario) {
+		ArrayList<Cartao> cartoesUsuario = GerCartao.getCartoesUsuario(usuario);
+		return cartoesUsuario.size() > 0;
 	}
 	
 }

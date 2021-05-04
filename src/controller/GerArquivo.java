@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.json.simple.JSONArray;
 
+import model.Cartao;
 import model.Gasto;
 import model.Usuario;
 
@@ -31,6 +31,18 @@ public class GerArquivo {
 		
 		try (FileWriter arquivo = new FileWriter("dados\\gastos.txt")) {
 			conteudo.add(gasto.getJSON());
+			arquivo.write(conteudo.toJSONString());
+		} catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+	// escreve gastos no txt do usuário
+	public static void escreveCartao(Cartao cartao) {
+		JSONArray conteudo = GerJSON.getJSON("dados\\cartoes.txt");
+		
+		try (FileWriter arquivo = new FileWriter("dados\\cartoes.txt")) {
+			conteudo.add(cartao.getJSON());
 			arquivo.write(conteudo.toJSONString());
 		} catch (IOException e) {
             e.printStackTrace();

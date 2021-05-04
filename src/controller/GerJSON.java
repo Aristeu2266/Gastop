@@ -11,7 +11,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import model.Cartao;
 import model.Gasto;
+import model.GastoCartao;
+import model.GastoComum;
 import model.Usuario;
 
 public class GerJSON {
@@ -36,7 +39,7 @@ public class GerJSON {
 		return jSONArray;
 	}
 
-	// transforma um json object em um json usuário
+	// transforma um json object em um objeto Usuário
 	private static Usuario JSONtoUsuario(JSONObject objeto) {
 		String login = "";
 		String senha = "";
@@ -60,12 +63,14 @@ public class GerJSON {
 		return new Usuario(login, senha, renda);
 	}
 
-	// transforma um json object em um json usuário
+	// transforma um json object em um objeto Gasto
 	private static Gasto JSONtoGasto(JSONObject objeto) {
 		String user = "";
 		double valor = 0;
 		String desc = "";
 		String data = "";
+		String cartao = "";
+		
 		for (Object chave : objeto.keySet()) {
 			if (chave.equals("usuario")) {
 				user = (String) objeto.get(chave);
@@ -73,13 +78,35 @@ public class GerJSON {
 				valor = (double) objeto.get(chave);
 			} else if (chave.equals("descricao")) {
 				desc = (String) objeto.get(chave);
-			} else {
+			} else if (chave.equals("data")){
 				data = (String) objeto.get(chave);
+			} else {
+				cartao = (String) objeto.get(chave);
+			}
+		}
+		
+		if (cartao.equals("")) {
+			return new GastoComum(user, valor, desc, data);
+		} else {
+			return new GastoCartao(user, valor, desc, data, new Cartao(user, cartao));
+		}
+
+	}
+
+	// transforma um json object em um objeto Cartao
+	private static Cartao JSONtoCartao(JSONObject objeto) {
+		String user = "";
+		String nome = "";
+		for (Object chave : objeto.keySet()) {
+			if (chave.equals("usuario")) {
+				user = (String) objeto.get(chave);
+			} else {
+				nome = (String) objeto.get(chave);
 			}
 
 		}
 
-		return new Gasto(user, valor, desc, data);
+		return new Cartao(user, nome);
 	}
 
 	// transforma um json array em um array de usuario
@@ -108,5 +135,17 @@ public class GerJSON {
 		}
 
 		return gastos;
+	}
+
+	// transforma um json array em um array de cartao
+	public static ArrayList<Cartao> cartoesJSONtoArrayList(JSONArray jSONArray) {
+		ArrayList<Cartao> cartoes = new ArrayList<Cartao>();
+		Iterator it = jSONArray.iterator();
+
+		while (it.hasNext()) {
+			cartoes.add(JSONtoCartao((JSONObject) it.next()));
+		}
+
+		return cartoes;
 	}
 }
